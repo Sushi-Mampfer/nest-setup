@@ -1,7 +1,7 @@
 use std::{
     env, fmt,
     fs::{self, File},
-    io::{self, Write},
+    io::{self, BufRead, BufReader, Write},
     path::PathBuf,
     process::Command,
 };
@@ -10,6 +10,7 @@ use clap::{Parser, Subcommand};
 use regex::Regex;
 
 struct Service {
+    domain: Option<String>,
     name: String,
     description: String,
     dir: String,
@@ -20,6 +21,9 @@ struct Service {
 
 impl fmt::Display for Service {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        if let Some(domain) = &self.domain {
+            writeln!(f, "#{}", domain)?;
+        };
         writeln!(f, "[Unit]")?;
         writeln!(f, "Description={}", self.description)?;
         writeln!(f)?;
@@ -104,7 +108,7 @@ fn main() {
                 dir = "%h".to_string();
             }
 
-            let mut port = Some(ask("Port [auto, \"-\" = none]".to_string()));
+            let mut port = Some(ask("Port [auto, \"-\" = no subdomain created]".to_string()));
             if port == Some("".to_string()) {
                 let mut cmd = Command::new("nest");
                 cmd.arg("get_port");
@@ -113,6 +117,7 @@ fn main() {
                 let re = Regex::new(r"Port (\d+)").unwrap();
                 if let Some(caps) = re.captures(&stdout) {
                     port = Some(caps[1].parse().unwrap());
+                    println!("Chose port {}", port.clone().unwrap());
                 } else {
                     eprintln!("Unable to find port");
                     return;
@@ -133,7 +138,33 @@ fn main() {
                 }
             };
 
+            let domain = if let Some(port) = port.clone() {
+                let domain = loop {
+                    let domain = ask("Full domain".to_string());
+                    if domain != "".to_string() {
+                        break domain;
+                    }
+                };
+                let mut cmd = Command::new("nest");
+                cmd.args([
+                    "caddy",
+                    "add",
+                    &domain,
+                    "--proxy",
+                    &format!("http://localhost:{}", port),
+                ]);
+                let status = cmd.status().unwrap();
+                if !status.success() {
+                    eprintln!("Failed to create subdomain: {}", status);
+                    return;
+                }
+                Some(domain)
+            } else {
+                None
+            };
+
             let service = Service {
+                domain,
                 name: name.clone(),
                 description,
                 dir,
@@ -162,7 +193,9 @@ fn main() {
                 let status = cmd.status().unwrap();
                 if !status.success() {
                     eprintln!("Failed to enable service: {}", status);
+                    return;
                 }
+                println!("Successfully started service.")
             }
         }
         Commands::Start { name } => {
@@ -172,7 +205,9 @@ fn main() {
                 .unwrap();
             if !status.success() {
                 eprintln!("Failed to start service: {}", status);
+                return;
             }
+            println!("Successfully started service.")
         }
         Commands::Stop { name } => {
             let status = Command::new("systemctl")
@@ -181,7 +216,9 @@ fn main() {
                 .unwrap();
             if !status.success() {
                 eprintln!("Failed to stop service: {}", status);
+                return;
             }
+            println!("Successfully stopped service.")
         }
         Commands::Enable { name, now } => {
             let mut cmd = Command::new("systemctl");
@@ -192,7 +229,9 @@ fn main() {
             let status = cmd.status().unwrap();
             if !status.success() {
                 eprintln!("Failed to enable service: {}", status);
+                return;
             }
+            println!("Successfully enabled service.")
         }
         Commands::Disable { name, now } => {
             let mut cmd = Command::new("systemctl");
@@ -203,7 +242,9 @@ fn main() {
             let status = cmd.status().unwrap();
             if !status.success() {
                 eprintln!("Failed to disable service: {}", status);
+                return;
             }
+            println!("Successfully disabled service.")
         }
         Commands::Delete { name, force } => {
             let home = env::var("HOME").expect("No $HOME found.");
@@ -231,7 +272,21 @@ fn main() {
             path.push("systemd");
             path.push("user");
             path.push(format!("{}.service", name));
-            fs::remove_file(path).unwrap()
+            {
+                let file = File::open(&path).unwrap();
+                let mut reader = BufReader::new(file);
+                let mut domain = String::new();
+                reader.read_line(&mut domain).unwrap();
+                let mut cmd = Command::new("nest");
+                cmd.args(["caddy", "rm", &domain.replace("#", "")]);
+                let status = cmd.status().unwrap();
+                if !status.success() {
+                    eprintln!("Failed to remove domain: {}", status);
+                }
+            }
+
+            fs::remove_file(path).unwrap();
+            println!("Successfully deleted service.")
         }
     }
 }
