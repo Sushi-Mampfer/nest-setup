@@ -60,6 +60,8 @@ enum Commands {
     Start { name: String },
     /// stops a service
     Stop { name: String },
+    /// stops and starts a service
+    Restart { name: String },
     /// enables a service
     Enable {
         name: String,
@@ -218,6 +220,17 @@ fn main() {
                 .unwrap();
             if !status.success() {
                 eprintln!("Failed to stop service, {}", status);
+                return;
+            }
+            println!("Successfully stopped service.")
+        }
+        Commands::Restart { name } => {
+            let status = Command::new("systemctl")
+                .args(["--user", "restart", &name])
+                .status()
+                .unwrap();
+            if !status.success() {
+                eprintln!("Failed to restart service, {}", status);
                 return;
             }
             println!("Successfully stopped service.")
