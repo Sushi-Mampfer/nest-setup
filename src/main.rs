@@ -177,14 +177,16 @@ fn main() {
             path.push("systemd");
             path.push("user");
             path.push(format!("{}.service", service.name));
-            let mut file = File::create(path).unwrap();
+            let mut file = File::create(&path).unwrap();
             write!(file, "{}", service).unwrap();
 
             let mut cmd = Command::new("systemctl");
-            cmd.args(["--user", "deamon-reload"]);
+            cmd.args(["--user", "daemon-reload"]);
             let status = cmd.status().unwrap();
             if !status.success() {
-                eprintln!("Failed to reload deamon: {}", status);
+                eprintln!("Failed to reload daemon: {}", status);
+                fs::remove_file(path).unwrap();
+                return;
             }
 
             if ask_yes("Service created, should it be enabled and started now?".to_string()) {
@@ -281,7 +283,7 @@ fn main() {
                 cmd.args(["caddy", "rm", &domain.replace("#", "")]);
                 let status = cmd.status().unwrap();
                 if !status.success() {
-                    eprintln!("Failed to remove domain: {}", status);
+                    eprintln!("Failed to remove domain: {}, {}", domain, status);
                 }
             }
 
