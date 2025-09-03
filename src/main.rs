@@ -155,7 +155,7 @@ fn main() {
                 ]);
                 let status = cmd.status().unwrap();
                 if !status.success() {
-                    eprintln!("Failed to create subdomain: {}", status);
+                    eprintln!("Failed to create subdomain, {}", status);
                     return;
                 }
                 Some(domain)
@@ -184,7 +184,7 @@ fn main() {
             cmd.args(["--user", "daemon-reload"]);
             let status = cmd.status().unwrap();
             if !status.success() {
-                eprintln!("Failed to reload daemon: {}", status);
+                eprintln!("Failed to reload daemon, {}", status);
                 fs::remove_file(path).unwrap();
                 return;
             }
@@ -194,7 +194,7 @@ fn main() {
                 cmd.args(["--user", "enable", &name, "--now"]);
                 let status = cmd.status().unwrap();
                 if !status.success() {
-                    eprintln!("Failed to enable service: {}", status);
+                    eprintln!("Failed to enable service, {}", status);
                     return;
                 }
                 println!("Successfully started service.")
@@ -217,7 +217,7 @@ fn main() {
                 .status()
                 .unwrap();
             if !status.success() {
-                eprintln!("Failed to stop service: {}", status);
+                eprintln!("Failed to stop service, {}", status);
                 return;
             }
             println!("Successfully stopped service.")
@@ -230,7 +230,7 @@ fn main() {
             }
             let status = cmd.status().unwrap();
             if !status.success() {
-                eprintln!("Failed to enable service: {}", status);
+                eprintln!("Failed to enable service, {}", status);
                 return;
             }
             println!("Successfully enabled service.")
@@ -243,7 +243,7 @@ fn main() {
             }
             let status = cmd.status().unwrap();
             if !status.success() {
-                eprintln!("Failed to disable service: {}", status);
+                eprintln!("Failed to disable service, {}", status);
                 return;
             }
             println!("Successfully disabled service.")
@@ -265,7 +265,7 @@ fn main() {
                 .status()
                 .unwrap();
             if !status.success() {
-                eprintln!("Failed to stop service: {}", status);
+                eprintln!("Failed to stop service, {}", status);
                 return;
             }
 
