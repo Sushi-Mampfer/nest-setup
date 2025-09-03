@@ -298,6 +298,8 @@ fn main() {
                 let status = cmd.status().unwrap();
                 if !status.success() {
                     eprintln!("Failed to remove domain: {}, {}", domain, status);
+                } else {
+                    println!("Successfully removed domain: {}", domain);
                 }
             }
 
