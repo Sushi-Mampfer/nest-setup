@@ -292,8 +292,9 @@ fn main() {
                 let mut reader = BufReader::new(file);
                 let mut domain = String::new();
                 reader.read_line(&mut domain).unwrap();
+                let domain = domain.trim().replace("#", "");
                 let mut cmd = Command::new("nest");
-                cmd.args(["caddy", "rm", &domain.replace("#", "")]);
+                cmd.args(["caddy", "rm", &domain]);
                 let status = cmd.status().unwrap();
                 if !status.success() {
                     eprintln!("Failed to remove domain: {}, {}", domain, status);
