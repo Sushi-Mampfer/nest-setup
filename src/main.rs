@@ -153,7 +153,7 @@ fn main() {
                     "add",
                     &domain,
                     "--proxy",
-                    &format!("http://localhost:{}", port),
+                    &format!("localhost:{}", port),
                 ]);
                 let status = cmd.status().unwrap();
                 if !status.success() {
