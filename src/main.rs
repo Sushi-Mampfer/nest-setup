@@ -233,7 +233,7 @@ fn main() {
                 eprintln!("Failed to restart service, {}", status);
                 return;
             }
-            println!("Successfully stopped service.")
+            println!("Successfully restarted service.")
         }
         Commands::Enable { name, now } => {
             let mut cmd = Command::new("systemctl");
