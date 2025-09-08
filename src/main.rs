@@ -35,7 +35,6 @@ impl fmt::Display for Service {
         if let Some(cmd) = &self.pre_start_cmd {
             writeln!(f, "ExecStartPre=-{}", cmd)?;
         }
-        writeln!(f, "[Service]")?;
         writeln!(f, "ExecStart={}", self.start_cmd)?;
         writeln!(f, "Restart=on-failure")?;
         writeln!(f)?;
