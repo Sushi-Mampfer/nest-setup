@@ -34,3 +34,6 @@ Commands:
 Options:
   -h, --help     Print help
   -V, --version  Print version
+
+# Video demo
+https://hc-cdn.hel1.your-objectstorage.com/s/v3/72d8cc45d7ccbf74df7dc7dd693815fbd0aec675_20250903-1704-07.9032944.mp4
