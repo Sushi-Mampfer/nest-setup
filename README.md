@@ -3,7 +3,7 @@ A small executable to create and manage services on nest.
 
 ## Disclaimer
 - This only works on [nest](https://hackclub.app/)
-- If you're reviewing or voting on my project for SoM please check out the [Voting guide](https://github.com/Sushi-Mampfer/nest-setup/VOTING.md)
+- If you're reviewing or voting on my project for SoM please check out the [Voting guide](https://github.com/Sushi-Mampfer/nest-setup/blob/master/VOTING.md)
 
 ## Installation
 ### Easy
