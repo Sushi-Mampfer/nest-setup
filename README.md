@@ -1,6 +1,10 @@
 # Nest Setup
 A small executable to create and manage services on nest.
 
+## Disclaimer
+- This only works on [nest](https://hackclub.app/)
+- If you're reviewing or voting on my project for SoM please check out the [Voting guide](https://github.com/Sushi-Mampfer/nest-setup/VOTING.md)
+
 ## Installation
 ### Easy
 `curl -sSf https://raw.githubusercontent.com/Sushi-Mampfer/nest-setup/refs/heads/master/install.sh | sh`
