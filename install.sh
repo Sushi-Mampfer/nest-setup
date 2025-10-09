@@ -1,6 +1,6 @@
 #!/bin/sh
 
-printf "Name? [service]: "
+printf "Name for the executable? [service]: "
 read name < /dev/tty
 
 if [ -z "$name" ]; then
